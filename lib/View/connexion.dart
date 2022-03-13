@@ -1,6 +1,7 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:test_dill/API/HTTPUtility.dart';
 import 'package:test_dill/Ressources/constants.dart';
 import 'package:test_dill/Ressources/drawer.dart';
 import 'dart:developer' as developer;
@@ -12,10 +13,10 @@ class Connexion extends StatefulWidget {
   _Connexion createState() => _Connexion();
 }
 
-class _Connexion extends State<Connexion>{
-
+class _Connexion extends State<Connexion> {
   final _formKey = GlobalKey<FormState>();
   String email = "";
+  String mdp = "";
 
   @override
   Widget build(BuildContext context) {
@@ -33,21 +34,18 @@ class _Connexion extends State<Connexion>{
               children: [
                 const Text(
                   "Connexion",
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 24
-                  ),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
                 ),
                 Form(
-                  key : _formKey,
-                  child : Column(
+                  key: _formKey,
+                  child: Column(
                     children: [
                       Padding(
-
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 16),
                         child: TextFormField(
                           validator: (String? value) {
-                            if(EmailValidator.validate(value!)){
+                            if (EmailValidator.validate(value!)) {
                               return null;
                             }
                             return "Email non valide";
@@ -57,56 +55,69 @@ class _Connexion extends State<Connexion>{
                           },
                           decoration: InputDecoration(
                               enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: rouge_principal, width: 1.0),
+                                borderSide: BorderSide(
+                                    color: rouge_principal, width: 1.0),
                                 borderRadius: BorderRadius.circular(50.0),
                               ),
                               focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(color: Colors.blue, width: 1.0),
+                                borderSide: const BorderSide(
+                                    color: Colors.blue, width: 1.0),
                                 borderRadius: BorderRadius.circular(50.0),
                               ),
-                              contentPadding: const EdgeInsets.fromLTRB(25, 0, 0, 0),
+                              contentPadding:
+                                  const EdgeInsets.fromLTRB(25, 0, 0, 0),
                               hintText: 'email'.toUpperCase(),
                               hintStyle: TextStyle(
                                   color: placeholder_color,
-                                  fontWeight: FontWeight.bold
-                              ),
+                                  fontWeight: FontWeight.bold),
                               suffixIcon: const Icon(
                                 Icons.account_circle_outlined,
-                              )
-                          ),
+                              )),
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 16),
                         child: TextFormField(
                           obscureText: true,
+                          onSaved: (String? value) {
+                            mdp = value.toString();
+                          },
                           decoration: InputDecoration(
                               enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: rouge_principal, width: 1.0),
+                                borderSide: BorderSide(
+                                    color: rouge_principal, width: 1.0),
                                 borderRadius: BorderRadius.circular(50.0),
                               ),
                               focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(color: Colors.blue, width: 1.0),
+                                borderSide: const BorderSide(
+                                    color: Colors.blue, width: 1.0),
                                 borderRadius: BorderRadius.circular(50.0),
                               ),
-                              contentPadding: const EdgeInsets.fromLTRB(25, 0, 0, 0),
+                              contentPadding:
+                                  const EdgeInsets.fromLTRB(25, 0, 0, 0),
                               hintText: '**********'.toUpperCase(),
                               hintStyle: TextStyle(
                                   color: placeholder_color,
-                                  fontWeight: FontWeight.bold
-                              ),
+                                  fontWeight: FontWeight.bold),
                               suffixIcon: const Icon(
                                 Icons.password,
-                              )
-                          ),
+                              )),
                         ),
                       ),
                       const Padding(padding: EdgeInsets.only(top: 35)),
                       ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
                           if (_formKey.currentState!.validate()) {
+                            HTTPUtility.login = email;
+                            HTTPUtility.mdp = mdp;
                             developer.log("Je suis connecté");
-                            Navigator.pushNamed(context, "/movies");
+                            var test = await HTTPUtility.connexion();
+                            if (test) {
+                              Navigator.pushNamed(context, "/movies");
+                            } else {
+                              print("Bonjour");
+                            }
                           }
                         },
                         child: Center(
@@ -114,8 +125,7 @@ class _Connexion extends State<Connexion>{
                             'Connexion'.toUpperCase(),
                             style: const TextStyle(
                                 fontWeight: FontWeight.bold,
-                                color: Colors.black
-                            ),
+                                color: Colors.black),
                           ),
                         ),
                         style: ElevatedButton.styleFrom(
@@ -139,5 +149,4 @@ class _Connexion extends State<Connexion>{
       ),
     );
   }
-
 }
